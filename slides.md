@@ -1,8 +1,8 @@
 ---
 author: 
- - Jan Heiland & Peter Benner (MPI Magdeburg)
-title: Convolutional AEs for low-dimensional parameterizations of Navier-Stokes flow
-subtitle: CSC Ringberg Workshop -- 2022
+ - Jan Heiland & P. Goyal & I. Pontes-Duff & P. Benner (MPI Magdeburg)
+title: Identification of Models on Quadratic Manifolds
+subtitle: <br><br><br><br> Eccomas 2022
 title-slide-attributes:
     data-background-image: theme-pics/mpi-bridge.gif
 parallaxBackgroundImage: theme-pics/csc-en.svg
@@ -10,79 +10,98 @@ parallaxBackgroundSize: 1000px 1200px
 bibliography: nn-nse-ldlpv-talk.bib
 ---
 
-# Introduction 
-
-$$\dot x = f(x) + Bu$$
+# Nonlinear Model Order Reduction Schemes 
 
 ---
 
-## {data-background-image="pics/dbrc-v_Re50_stst_cm-bbw.png" data-background-size="cover"}
+In most MOR schemes, the state of $x(t)
+\in \mathbb R^{n}$ of a dynamical system
+\begin{equation*}
+\dot x(t) = f(x(t))
+\end{equation*}
+is **encoded** as
+\begin{equation*}
+q(t) = W^Tx(t)
+\end{equation*}
+and **decoded** via
+\begin{equation*}
+\tilde x(t) = Vq(t)
+\end{equation*}
+where $V$, $W\in \mathbb R^{n,k}$ are matrices.
 
-```
-data-background-size="cover"
-# spreads the background image over the whole window (default option)
-```
+---
 
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
+Encoding and decoding
+\begin{equation*}
+q(t) = W^Tx(t), \quad \tilde x(t) = Vq(t) = W^TVx(t)
+\end{equation*}
+with $V$, $W\in \mathbb R^{n,k}$ is a **linear MOR** scheme as
 
-. . .
+ * $k \ll n$ -- reduction of the dimension and
 
-::: {style="position: absolute; width: 60%; right: 0; box-shadow: 0 1px 4px rgba(0,0,0,0.5), 0 5px 25px rgba(0,0,0,0.2); background-color: rgba(0, 0, 0, 0.9); color: #fff; padding: 20px; font-size: 40px; text-align: left;"}
+ * $x(t)\approx \tilde x(t)=VW^Tq(t)$
 
-Stabilization of a laminar flow
+## Linear MOR schemes
 
- * 50'000 degrees of freedom
- * but linear regulator.
+* fairly standard (*POD*, *Balanced Truncation*)
+* fairly efficient (for linear systems or with hyperreduction like *DEIM*)
+* inherently limited in terms of reduction versus accuracy (cp. *Kolmogorov $n$-width*)
+* good evidence that at very low $k$, nonlinear encodings/decodings
+\begin{equation*}
+q(t) = h(x(t)), \quad \tilde x(t) = g(q(t))
+\end{equation*}
+provide better reduction vs. accuracy
+* though not necessarily computational efficiency
 
-```
-:::
-# fenced blocks for custom styles
-:::
-```
+## This talk
 
-:::
+* Formulation of a MOR scheme with a linear quadratic encoding
+\begin{equation*}
+\tilde x(t) = Vq(t) + \Omega \, q(t) \otimes q(t)
+\end{equation*}
+* use of *Operator inference* to identify a dynamical system
+\begin{equation*}
+M(q(t))\,\dot q(t) = A_0 + A_1\, q(t) + A_2\,q(t) \otimes q(t)
+\end{equation*}
+* that best approximates given data on a $k$-dimensional manifold.
+* Numerical proof of concept for a laminar flow problem.
 
-## Control of Nonlinear & Large-Scale Systems
-
-A general approach would include
-
- * powerful backends (linear algebra / optimization)
- * exploitation of general structures
- * data-driven surrogate models
- * all of it?!
-
-
-# LPV Representation
+# Quadratic Decoding
 
 $$
-\dot x = f(x) \approx A(x)\,x \approx [A_0+\Sigma \,\rho_k(x)A_k]\, x
+x(t) \approx \tilde x(t) = Vq(t) + \Omega\,q(t)\otimes q(t)
 $$
 
 ---
 
-Consider an ODE with $x(t)\in \mathbb R^n$ and some $\beta \in \mathbb R^n$:
+For a general nonlinear decoding
+\begin{equation*}
+x(t) \approx \tilde x(t) = g(q(t))
+\end{equation*}
+the dynamical system $\dot x(t) = f(x(t))$ is approximated and parametrized via $q$ as
+\begin{equation*}
+\dot {\tilde x(t)} = G(q(t)) \dot q(t) = f(g(q(t))
+\end{equation*}
+where 
+\begin{equation*}
+G(q(t)) = \nabla_q g(q(t)) \in \mathbb R^{n,k}
+\end{equation*}
+is the gradient of $g$ at $q(t)$.
 
-$$\dot x = (x\cdot \beta )\, x.$$
+---
 
-. . .
+With $g(q)=Vq + \Omega\,q\otimes q$, we have
+\begin{equation*}
+G(q)\bar q = V\bar q + \Omega\,q\otimes \bar q + \Omega\,\bar q\otimes q
+\end{equation*}
+and a approximation/parametrization of a linear system $\dot x(t) = Ax(t)$ as
+\begin{equation*}
+G(q)\dot q = A_1 q + A_2\, q\otimes q
+\end{equation*}
+with $A_1 = AV$ and $A_2 = A\Omega$.
 
-In a *reduced order model* with left projection matrix $\tilde V\in \mathbb R^{n,r}$: 
-$$ x \approx \tilde x = \tilde V\rho = \Sigma_{i=1}^r \tilde V_i \rho_i$$
 
-. . .
-
-```
-. . .  # makes the *beamer pause*
-``` 
-
-
-# Low-dimensional LPV for NSE
+# Numerical Realization and Example
 
 **LPV Approximation** of *Navier-Stokes Equations* by *POD* and *Convolutional Neural Networks*
 
@@ -123,6 +142,8 @@ $$
 \nabla \cdot v &= 0.
 \end{align}
 
+::: {style="position: absolute; width: 60%; right: 0; box-shadow: 0 1px 4px rgba(0,0,0,0.5), 0 5px 25px rgba(0,0,0,0.2); background-color: rgba(0, 0, 0, 0.9); color: #fff; padding: 20px; font-size: 40px; text-align: left;"}
+:::
 
 # Conclusion
 

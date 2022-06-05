@@ -8,14 +8,14 @@ pandoc $MDFILE -o slides.html \
 
 vim -s jointhelines.vim slides.html
 
-pandoc $MDFILE -o slides.pdf \
-    --citeproc \
-    --mathjax -t beamer -V theme:Berlin
-
-pandoc $MDFILE -o slides-body.tex \
-    --citeproc \
-    --mathjax -t beamer
-
-pandoc $MDFILE -s -o slides.tex \
-    --citeproc \
-    --mathjax -t beamer
+# pandoc $MDFILE -o slides.pdf \
+#     --citeproc \
+#     --mathjax -t beamer -V theme:Berlin
+# 
+# pandoc $MDFILE -o slides-body.tex \
+#     --citeproc \
+#     --mathjax -t beamer
+# 
+# pandoc $MDFILE -s -o slides.tex \
+#     --citeproc \
+#     --mathjax -t beamer
