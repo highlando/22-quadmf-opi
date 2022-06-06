@@ -63,6 +63,7 @@ provide better reduction vs. accuracy
 \begin{equation*}
 M(q(t))\,\dot q(t) = A_0 + A_1\, q(t) + A_2\,q(t) \otimes q(t)
 \end{equation*}
+
 * that best approximates given data on a $k$-dimensional manifold.
 * Numerical proof of concept for a laminar flow problem.
 
@@ -90,7 +91,11 @@ is the gradient of $g$ at $q(t)$.
 
 ---
 
-With $g(q)=Vq + \Omega\,q\otimes q$, we have
+With 
+\begin{equation*}
+g(q)=Vq + \Omega\,q\otimes q,
+\end{equation*}
+we have
 \begin{equation*}
 G(q)\bar q = V\bar q + \Omega\,q\otimes \bar q + \Omega\,\bar q\otimes q
 \end{equation*}
@@ -100,6 +105,52 @@ G(q)\dot q = A_1 q + A_2\, q\otimes q
 \end{equation*}
 with $A_1 = AV$ and $A_2 = A\Omega$.
 
+---
+
+Since for a manifold map $g\colon \mathbb R^{k}\to \mathbb R^{n}$, the gradient $\nabla_q g(q(t)) =: G(q(t))$ has full rank,
+\begin{equation*}
+G(q(t))^TG(q(t))\dot q(t) = G(q(t))^TA_1 q + G(q(t))^TA_2\, q\otimes q
+\end{equation*}
+gives a regular differential equation in $q$, which however comes with cubic parts
+\begin{equation*}
+M(q)\dot q(t) = \tilde A_1 q + \tilde A_2\, q\otimes q + \tilde A_3 q\otimes q \otimes q
+\end{equation*}
+
+# Operator Inference
+
+Using data to infer a system with a quadratic decoding
+
+---
+
+We use a POD basis $V\in \mathbb R^{n,k}$ to encode a set of snapshots
+\begin{equation*}
+[v(t_1),\ v(t_2), \dots, v(t_N) ] \to [q(t_1),\ q(t_2), \dots, q(t_N) ]
+\end{equation*}
+by $q(t_i) = Vv(t_i) \in \mathbb R^{k}$
+In a first step, we infer the quadratic correction $\Omega \in \mathbb R^{N,k^2}$ via 
+\begin{equation*}
+\sum_{i=1}^N \| v(t_i) - Vq(t_i) - \Omega \, q(t_i) \otimes q(t_i)\|^2 \to \min
+\end{equation*}
+
+---
+
+Next, we *differentiate* the snapshots to compute
+\begin{equation*}
+\dot v(t_i) \to \dot q(t_i) = V\dot v(t_i)
+\end{equation*}
+and, with the gradient $G(q)$ of the decoding $q\to \tilde v$ at hand, we can form
+the derivative along the manifold
+\begin{equation*}
+\dot {\tilde x}(t_i) = G(q(t_i))\dot q(t_i)
+\end{equation*}
+
+---
+
+Finally we can solve the quadratic operator inference problem
+\begin{equation*}
+\sum_{i=1}^N \| M(q(t_i))\,\dot q(t_i) - A_0 + A_1\, q(t_i) - A_2\, q(t_i)\otimes q(t_i)\|^2 \to \min
+\end{equation*}
+that fits a quadratic system to the given snapshots.
 
 # Numerical Realization and Example
 
