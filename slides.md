@@ -29,7 +29,7 @@ and **decoded** via
 \begin{equation*}
 \tilde x(t) = Vq(t)
 \end{equation*}
-where $V$, $W\in \mathbb R^{n,k}$ are matrices.
+where $V$, $W\in \mathbb R^{n,r}$ are matrices.
 
 ---
 
@@ -37,18 +37,21 @@ Encoding and decoding
 \begin{equation*}
 q(t) = W^Tx(t), \quad \tilde x(t) = Vq(t) = W^TVx(t)
 \end{equation*}
-with $V$, $W\in \mathbb R^{n,k}$ is a **linear MOR** scheme as
+with $V$, $W\in \mathbb R^{n,r}$ is a **linear MOR** scheme as
 
- * $k \ll n$ -- reduction of the dimension and
+ * $r \ll n$ -- reduction of the dimension and
 
- * $x(t)\approx \tilde x(t)=VW^Tq(t)$
+ * $x(t)\approx \tilde x(t)=VW^Tx(t)$
 
 ## Linear MOR schemes
 
 * fairly standard (*POD*, *Balanced Truncation*)
 * fairly efficient (for linear systems or with hyperreduction like *DEIM*)
 * inherently limited in terms of reduction versus accuracy (cp. *Kolmogorov $n$-width*)
-* good evidence that at very low $k$, nonlinear encodings/decodings
+
+. . .
+
+* good evidence that at very low $r$, nonlinear encodings/decodings
 \begin{equation*}
 q(t) = h(x(t)), \quad \tilde x(t) = g(q(t))
 \end{equation*}
@@ -66,8 +69,8 @@ provide better reduction vs. accuracy
 M(q(t))\,\dot q(t) = A_0 + A_1\, q(t) + A_2\,q(t) \otimes q(t)
 \end{equation*}
 
-* that best approximates given data on a $k$-dimensional manifold
-* Numerical proof of concept for a laminar flow problem
+* that best approximates given data on a $r$-dimensional manifold
+* numerical proof of concept for a laminar flow problem
 
 # Quadratic Decoding
 
@@ -83,11 +86,15 @@ x(t) \approx \tilde x(t) = g(q(t))
 \end{equation*}
 the dynamical system $\dot x(t) = f(x(t))$ is approximated and parametrized
 \begin{equation*}
-\dot {\tilde x(t)} = G(q(t)) \dot q(t) = f(g(q(t))
+\dot {\tilde x}(t) = f(\tilde x(t)) \quad \leftrightarrow \quad
+G(q(t)) \dot q(t) = f(g(q(t))
 \end{equation*}
+
+. . .
+
 where 
 \begin{equation*}
-G(q(t)) = \nabla g(q(t)) \in \mathbb R^{n,k}
+G(q(t)) := \nabla g(q(t)) \in \mathbb R^{n,r}
 \end{equation*}
 is the Jacobian of $g$ at $q(t)$.
 
@@ -101,6 +108,9 @@ we have
 \begin{equation*}
 G(q)\bar q = V\bar q + \Omega\,q\otimes \bar q + \Omega\,\bar q\otimes q
 \end{equation*}
+
+. . .
+
 and an approximation/parametrization of a linear system $\dot x(t) = Ax(t)$ as
 \begin{equation*}
 G(q)\dot q = A_1 q + A_2\, q\otimes q
@@ -109,14 +119,18 @@ with $A_1 = AV$ and $A_2 = A\Omega$.
 
 ---
 
-Since for a manifold map $g\colon \mathbb R^{k}\to \mathbb R^{n}$, the Jacobian $$\nabla g(q(t)) =: G(q(t))$$ has full rank,
+Since for a manifold map $g\colon \mathbb R^{r}\to \mathbb R^{n}$, the Jacobian $$\nabla g(q(t)) =: G(q(t))$$ has full rank,
 
 . . .
 
 \begin{equation*}
 G(q(t))^TG(q(t))\dot q(t) = G(q(t))^TA_1 q + G(q(t))^TA_2\, q\otimes q
 \end{equation*}
-gives a regular differential equation in $q$, which however comes with cubic parts
+gives a regular differential equation in $q$, 
+
+. . .
+
+which however comes with cubic parts
 \begin{equation*}
 M(q)\dot q(t) = \tilde A_1 q + \tilde A_2\, q\otimes q + \tilde A_3 q\otimes q \otimes q
 \end{equation*}
@@ -127,26 +141,26 @@ Using data to infer a system with a quadratic decoding
 
 ---
 
-We use a POD basis $V\in \mathbb R^{n,k}$ to encode a set of snapshots
+We use a POD basis $V\in \mathbb R^{n,r}$ to encode a set of snapshots
 \begin{equation*}
-[v(t_1),\ v(t_2), \dots, v(t_N) ] \to [q(t_1),\ q(t_2), \dots, q(t_N) ]
+[x(t_1),\ x(t_2), \dots, x(t_N) ] \to [q(t_1),\ q(t_2), \dots, q(t_N) ]
 \end{equation*}
-by $$q(t_i) = Vv(t_i) \in \mathbb R^{k}$$
+by $$q(t_i) = V^Tx(t_i) \in \mathbb R^{r}$$
 
 . . .
 
-In a first step, we infer the quadratic correction $\Omega \in \mathbb R^{N,k^2}$ via 
+In a first step, we infer the quadratic correction $\Omega \in \mathbb R^{N,r^2}$ via 
 \begin{equation*}
-\sum_{i=1}^N \| v(t_i) - Vq(t_i) - \Omega \, q(t_i) \otimes q(t_i)\|^2 \to \min
+\sum_{i=1}^N \| x(t_i) - Vq(t_i) - \Omega \, q(t_i) \otimes q(t_i)\|^2 \to \min
 \end{equation*}
 
 ---
 
 Next, we *differentiate* the snapshots to compute
 \begin{equation*}
-\dot v(t_i) \to \dot q(t_i) = V\dot v(t_i)
+\dot x(t_i) \to \dot q(t_i) = V\dot x(t_i)
 \end{equation*}
-and, with the Jacobian $G(q)$ of the decoding $q\to \tilde v$ at hand, we can form
+and, with the Jacobian $G(q)$ at hand, we can form
 the derivative along the manifold
 \begin{equation*}
 \dot {\tilde x}(t_i) = G(q(t_i))\dot q(t_i)
@@ -156,8 +170,13 @@ the derivative along the manifold
 
 Finally we can solve the quadratic operator inference problem
 \begin{equation*}
-\sum_{i=1}^N \| M(q(t_i))\,\dot q(t_i) - A_0 + A_1\, q(t_i) - A_2\, q(t_i)\otimes q(t_i)\|^2 \to \min
+\sum_{i=1}^N \| M(q(t_i))\,\dot q(t_i) - A_0 - A_1\, q(t_i) - A_2\, q(t_i)\otimes q(t_i)\|^2 \to \min
 \end{equation*}
+
+for 
+
+$$A_0 \in \mathbb R^{r,1}, \quad A_1\in \mathbb R^{r,r}, \quad A_2 \in \mathbb R^{r, r^2}$$
+
 that fits a quadratic system to the given snapshots.
 
 # Numerical Example
@@ -183,8 +202,8 @@ $$
 
  * 2D laminar lid driven cavity at `Re=500`
  * About 4000 `dof` in the FEM model
- * 400 snapshots on `[0, 4.8]` time interval
- * Reduced order model of size `r=5,8,12`
+ * 400 velocity $v$ snapshots on the `[0, 4.8]` time interval
+ * Reduced order model for the velocity of size `r=5,8,12`
  * Extrapolation to the `[4.8, 6]` time interval
  * Comparison with `POD`, `DMDc`, `OpInf`
 :::

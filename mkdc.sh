@@ -1,12 +1,12 @@
 MDFILE=slides.md
 
-pandoc $MDFILE -o slides.html \
-    --citeproc \
+pandoc $MDFILE -o index.html \
+    --citeproc --csl=frontiers-in-physics.csl \
     --mathjax -t revealjs --slide-level=2 -s \
     -V theme=solarized \
     -V viewDistance=15 -V width=1280 -V height=880 -V margin=0.05
 
-vim -s jointhelines.vim slides.html
+vim -s jointhelines.vim index.html
 
 # pandoc $MDFILE -o slides.pdf \
 #     --citeproc \

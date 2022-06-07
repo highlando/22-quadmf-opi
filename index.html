@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="author" content="Jan Heiland &amp; P. Goyal &amp; I. Pontes-Duff &amp; P. Benner (MPI Magdeburg)">
+  <title>Identification of Models on Quadratic Manifolds</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="https://unpkg.com/reveal.js@^4//dist/reset.css">
+  <link rel="stylesheet" href="https://unpkg.com/reveal.js@^4//dist/reveal.css">
+  <style>
+    .reveal .sourceCode {  /* see #7635 */
+      overflow: visible;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    div.csl-bib-body { }
+    div.csl-entry {
+      clear: both;
+    }
+    .hanging div.csl-entry {
+      margin-left:2em;
+      text-indent:-2em;
+    }
+    div.csl-left-margin {
+      min-width:2em;
+      float:left;
+    }
+    div.csl-right-inline {
+      margin-left:2em;
+      padding-left:1em;
+    }
+    div.csl-indent {
+      margin-left: 2em;
+    }
+  </style>
+  <link rel="stylesheet" href="https://unpkg.com/reveal.js@^4//dist/theme/solarized.css" id="theme">
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" data-background-image="theme-pics/mpi-bridge.gif">
+  <h1 class="title">Identification of Models on Quadratic Manifolds</h1>
+  <p class="subtitle"><br><br><br><br> Eccomas 2022</p>
+  <p class="author">Jan Heiland &amp; P. Goyal &amp; I. Pontes-Duff
+&amp; P. Benner (MPI Magdeburg)</p>
+</section>
+
+<section>
+<section id="nonlinear-model-order-reduction-schemes"
+class="title-slide slide level1">
+<h1>Nonlinear Model Order Reduction Schemes</h1>
+
+</section>
+<section class="slide level2">
+
+<p>In most MOR schemes, the state of <span class="math inline">\(x(t)
+\in \mathbb R^{n}\)</span> of a dynamical system <span
+class="math display">\[\begin{equation*}
+\dot x(t) = f(x(t))
+\end{equation*}\]</span> is <strong>encoded</strong> as <span
+class="math display">\[\begin{equation*}
+q(t) = W^Tx(t)
+\end{equation*}\]</span> and <strong>decoded</strong> via <span
+class="math display">\[\begin{equation*}
+\tilde x(t) = Vq(t)
+\end{equation*}\]</span> where <span class="math inline">\(V\)</span>,
+<span class="math inline">\(W\in \mathbb R^{n,r}\)</span> are
+matrices.</p>
+</section>
+<section class="slide level2">
+
+<p>Encoding and decoding <span class="math display">\[\begin{equation*}
+q(t) = W^Tx(t), \quad \tilde x(t) = Vq(t) = W^TVx(t)
+\end{equation*}\]</span> with <span class="math inline">\(V\)</span>,
+<span class="math inline">\(W\in \mathbb R^{n,r}\)</span> is a
+<strong>linear MOR</strong> scheme as</p>
+<ul>
+<li><p><span class="math inline">\(r \ll n\)</span> – reduction of the
+dimension and</p></li>
+<li><p><span class="math inline">\(x(t)\approx \tilde
+x(t)=VW^Tx(t)\)</span></p></li>
+</ul>
+</section>
+<section id="linear-mor-schemes" class="slide level2">
+<h2>Linear MOR schemes</h2>
+<ul>
+<li>fairly standard (<em>POD</em>, <em>Balanced Truncation</em>)</li>
+<li>fairly efficient (for linear systems or with hyperreduction like
+<em>DEIM</em>)</li>
+<li>inherently limited in terms of reduction versus accuracy
+(cp. <em>Kolmogorov <span
+class="math inline">\(n\)</span>-width</em>)</li>
+</ul>
+<div class="fragment">
+<ul>
+<li>good evidence that at very low <span
+class="math inline">\(r\)</span>, nonlinear encodings/decodings <span
+class="math display">\[\begin{equation*}
+q(t) = h(x(t)), \quad \tilde x(t) = g(q(t))
+\end{equation*}\]</span> provide better reduction vs. accuracy</li>
+<li>though not necessarily computational efficiency</li>
+</ul>
+</div>
+</section>
+<section id="this-talk" class="slide level2">
+<h2>This talk</h2>
+<ul>
+<li><p>Formulation of a MOR scheme with a linear quadratic encoding
+<span class="math display">\[\begin{equation*}
+\tilde x(t) = Vq(t) + \Omega \, q(t) \otimes q(t)
+\end{equation*}\]</span></p></li>
+<li><p>use of <em>Operator inference</em> to identify a dynamical system
+<span class="math display">\[\begin{equation*}
+M(q(t))\,\dot q(t) = A_0 + A_1\, q(t) + A_2\,q(t) \otimes q(t)
+\end{equation*}\]</span></p></li>
+<li><p>that best approximates given data on a <span
+class="math inline">\(r\)</span>-dimensional manifold</p></li>
+<li><p>numerical proof of concept for a laminar flow problem</p></li>
+</ul>
+</section></section>
+<section>
+<section id="quadratic-decoding" class="title-slide slide level1">
+<h1>Quadratic Decoding</h1>
+<p><span class="math display">\[
+x(t) \approx \tilde x(t) = Vq(t) + \Omega\,q(t)\otimes q(t)
+\]</span></p>
+</section>
+<section class="slide level2">
+
+<p>For a general nonlinear decoding <span
+class="math display">\[\begin{equation*}
+x(t) \approx \tilde x(t) = g(q(t))
+\end{equation*}\]</span> the dynamical system <span
+class="math inline">\(\dot x(t) = f(x(t))\)</span> is approximated and
+parametrized <span class="math display">\[\begin{equation*}
+\dot {\tilde x}(t) = f(\tilde x(t)) \quad \leftrightarrow \quad
+G(q(t)) \dot q(t) = f(g(q(t))
+\end{equation*}\]</span></p>
+<div class="fragment">
+<p>where <span class="math display">\[\begin{equation*}
+G(q(t)) := \nabla g(q(t)) \in \mathbb R^{n,r}
+\end{equation*}\]</span> is the Jacobian of <span
+class="math inline">\(g\)</span> at <span
+class="math inline">\(q(t)\)</span>.</p>
+</div>
+</section>
+<section class="slide level2">
+
+<p>With <span class="math display">\[\begin{equation*}
+g(q)=Vq + \Omega\,q\otimes q,
+\end{equation*}\]</span> we have <span
+class="math display">\[\begin{equation*}
+G(q)\bar q = V\bar q + \Omega\,q\otimes \bar q + \Omega\,\bar q\otimes q
+\end{equation*}\]</span></p>
+<div class="fragment">
+<p>and an approximation/parametrization of a linear system <span
+class="math inline">\(\dot x(t) = Ax(t)\)</span> as <span
+class="math display">\[\begin{equation*}
+G(q)\dot q = A_1 q + A_2\, q\otimes q
+\end{equation*}\]</span> with <span class="math inline">\(A_1 =
+AV\)</span> and <span class="math inline">\(A_2 = A\Omega\)</span>.</p>
+</div>
+</section>
+<section class="slide level2">
+
+<p>Since for a manifold map <span class="math inline">\(g\colon \mathbb
+R^{r}\to \mathbb R^{n}\)</span>, the Jacobian <span
+class="math display">\[\nabla g(q(t)) =: G(q(t))\]</span> has full
+rank,</p>
+<div class="fragment">
+<p><span class="math display">\[\begin{equation*}
+G(q(t))^TG(q(t))\dot q(t) = G(q(t))^TA_1 q + G(q(t))^TA_2\, q\otimes q
+\end{equation*}\]</span> gives a regular differential equation in <span
+class="math inline">\(q\)</span>,</p>
+</div>
+<div class="fragment">
+<p>which however comes with cubic parts <span
+class="math display">\[\begin{equation*}
+M(q)\dot q(t) = \tilde A_1 q + \tilde A_2\, q\otimes q + \tilde A_3
+q\otimes q \otimes q
+\end{equation*}\]</span></p>
+</div>
+</section></section>
+<section>
+<section id="operator-inference" class="title-slide slide level1">
+<h1>Operator Inference</h1>
+<p>Using data to infer a system with a quadratic decoding</p>
+</section>
+<section class="slide level2">
+
+<p>We use a POD basis <span class="math inline">\(V\in \mathbb
+R^{n,r}\)</span> to encode a set of snapshots <span
+class="math display">\[\begin{equation*}
+[x(t_1),\ x(t_2), \dots, x(t_N) ] \to [q(t_1),\ q(t_2), \dots, q(t_N) ]
+\end{equation*}\]</span> by <span class="math display">\[q(t_i) =
+V^Tx(t_i) \in \mathbb R^{r}\]</span></p>
+<div class="fragment">
+<p>In a first step, we infer the quadratic correction <span
+class="math inline">\(\Omega \in \mathbb R^{N,r^2}\)</span> via <span
+class="math display">\[\begin{equation*}
+\sum_{i=1}^N \| x(t_i) - Vq(t_i) - \Omega \, q(t_i) \otimes q(t_i)\|^2
+\to \min
+\end{equation*}\]</span></p>
+</div>
+</section>
+<section class="slide level2">
+
+<p>Next, we <em>differentiate</em> the snapshots to compute <span
+class="math display">\[\begin{equation*}
+\dot x(t_i) \to \dot q(t_i) = V\dot x(t_i)
+\end{equation*}\]</span> and, with the Jacobian <span
+class="math inline">\(G(q)\)</span> at hand, we can form the derivative
+along the manifold <span class="math display">\[\begin{equation*}
+\dot {\tilde x}(t_i) = G(q(t_i))\dot q(t_i)
+\end{equation*}\]</span></p>
+</section>
+<section class="slide level2">
+
+<p>Finally we can solve the quadratic operator inference problem <span
+class="math display">\[\begin{equation*}
+\sum_{i=1}^N \| M(q(t_i))\,\dot q(t_i) - A_0 - A_1\, q(t_i) - A_2\,
+q(t_i)\otimes q(t_i)\|^2 \to \min
+\end{equation*}\]</span></p>
+<p>for</p>
+<p><span class="math display">\[A_0 \in \mathbb R^{r,1}, \quad A_1\in
+\mathbb R^{r,r}, \quad A_2 \in \mathbb R^{r, r^2}\]</span></p>
+<p>that fits a quadratic system to the given snapshots.</p>
+</section></section>
+<section>
+<section id="numerical-example" class="title-slide slide level1">
+<h1>Numerical Example</h1>
+
+</section>
+<section id="section" class="slide level2"
+data-background-image="pics/drivcav_stst_re500.png">
+<h2 data-background-image="pics/drivcav_stst_re500.png"></h2>
+<div class="fragment">
+<div
+style="position: absolute; width: 60%; right: 0; box-shadow: 0 1px 4px rgba(0,0,0,0.5), 0 5px 25px rgba(0,0,0,0.2); background-color: rgba(0, 0, 0, 0.9); color: #fff; padding: 20px; font-size: 40px; text-align: left;">
+<p>FEM Simulation of Navier-Stokes equations <span
+class="math display">\[
+\dot v + (v\cdot \nabla) v- \frac{1}{\mathsf{Re}}\Delta v + \nabla p= f,
+\]</span> <span class="math display">\[
+\nabla \cdot v = 0.
+\]</span></p>
+</div>
+</div>
+</section>
+<section id="section-1" class="slide level2"
+data-background-image="pics/drivcav_stst_re500.png">
+<h2 data-background-image="pics/drivcav_stst_re500.png"></h2>
+<div
+style="position: absolute; width: 65%; right: 0; box-shadow: 0 1px 4px rgba(0,0,0,0.5), 0 5px 25px rgba(0,0,0,0.2); background-color: rgba(0, 0, 0, 0.9); color: #fff; padding: 20px; font-size: 40px; text-align: left;">
+<ul>
+<li>2D laminar lid driven cavity at <code>Re=500</code></li>
+<li>About 4000 <code>dof</code> in the FEM model</li>
+<li>400 velocity <span class="math inline">\(v\)</span> snapshots on the
+<code>[0, 4.8]</code> time interval</li>
+<li>Reduced order model for the velocity of size
+<code>r=5,8,12</code></li>
+<li>Extrapolation to the <code>[4.8, 6]</code> time interval</li>
+<li>Comparison with <code>POD</code>, <code>DMDc</code>,
+<code>OpInf</code></li>
+</ul>
+</div>
+</section>
+<section id="section-2" class="slide level2"
+data-background-image="pics/driven_cavity_time_domain_3042_rv5.png"
+data-background-size="80%">
+<h2 data-background-image="pics/driven_cavity_time_domain_3042_rv5.png"
+data-background-size="80%"></h2>
+</section>
+<section id="section-3" class="slide level2"
+data-background-image="pics/driven_cavity_time_domain_3042_rv8.png"
+data-background-size="80%">
+<h2 data-background-image="pics/driven_cavity_time_domain_3042_rv8.png"
+data-background-size="80%"></h2>
+</section>
+<section id="section-4" class="slide level2"
+data-background-image="pics/driven_cavity_time_domain_3042_rv12.png"
+data-background-size="80%">
+<h2 data-background-image="pics/driven_cavity_time_domain_3042_rv12.png"
+data-background-size="80%"></h2>
+</section></section>
+<section>
+<section id="conclusion" class="title-slide slide level1">
+<h1>Conclusion</h1>
+
+</section>
+<section id="and-outlook" class="slide level2">
+<h2>… and Outlook</h2>
+<ul>
+<li><p>Quadratic decoding aligns well with operator inference</p></li>
+<li><p>Tempting theory but no decisive numerical advantages
+observed</p></li>
+<li><p>Possible ways for improvement</p>
+<ul>
+<li>Regularization of the involved optimization problem</li>
+<li>Inference of higher order terms</li>
+</ul></li>
+</ul>
+<div class="fragment">
+<p>Thank You!</p>
+</div>
+</section>
+<section id="references" class="slide level2 unnumbered">
+<h2 class="unnumbered">References</h2>
+<div id="refs" class="references csl-bib-body" role="doc-bibliography">
+<div id="ref-DBLP:journals/corr/abs-2205-02304" class="csl-entry"
+role="doc-biblioentry">
+<div class="csl-left-margin">1. </div><div
+class="csl-right-inline">Geelen R, Wright S, Willcox K. Operator
+inference for non-intrusive model reduction with nonlinear manifolds.
+<em>CoRR</em> (2022) <strong>abs/2205.02304</strong>: doi:<a
+href="https://doi.org/10.48550/arXiv.2205.02304">10.48550/arXiv.2205.02304</a></div>
+</div>
+<div id="ref-DBLP:journals/corr/abs-2204-02462" class="csl-entry"
+role="doc-biblioentry">
+<div class="csl-left-margin">2. </div><div
+class="csl-right-inline">Barnett J, Farhat C. Quadratic approximation
+manifold for mitigating the <span>K</span>olmogorov barrier in nonlinear
+projection-based model order reduction. <em>CoRR</em> (2022)
+<strong>abs/2204.02462</strong>: doi:<a
+href="https://doi.org/10.48550/arXiv.2204.02462">10.48550/arXiv.2204.02462</a></div>
+</div>
+<div id="ref-BenGHP22" class="csl-entry" role="doc-biblioentry">
+<div class="csl-left-margin">3. </div><div
+class="csl-right-inline">Benner P, Goyal P, Heiland J, Pontes Duff I.
+Operator inference and physics-informed learning of low-dimensional
+models for incompressible flows. <em>Electron Trans Numer Anal</em>
+(2022) <strong>56</strong>:28–51. doi:<a
+href="https://doi.org/10.1553/etna_vol56s28">10.1553/etna_vol56s28</a></div>
+</div>
+</div>
+</section></section>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/reveal.js@^4//dist/reveal.js"></script>
+
+  <!-- reveal.js plugins -->
+  <script src="https://unpkg.com/reveal.js@^4//plugin/notes/notes.js"></script>
+  <script src="https://unpkg.com/reveal.js@^4//plugin/search/search.js"></script>
+  <script src="https://unpkg.com/reveal.js@^4//plugin/zoom/zoom.js"></script>
+  <script src="https://unpkg.com/reveal.js@^4//plugin/math/math.js"></script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+        // Display controls in the bottom right corner
+        controls: true,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: true,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'bottom-right',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: false,
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: false,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: true,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'default',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: true,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'slide',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'fade',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 15,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // Parallax background image
+        parallaxBackgroundImage: 'theme-pics/csc-en.svg', // e.g. "'https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg'"
+
+        // Parallax background size
+        parallaxBackgroundSize: '1000px 1200px', // CSS syntax, e.g. "2100px 900px"
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1280,
+
+        height: 880,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 0.05,
+
+        math: {
+          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    </body>
+</html>
