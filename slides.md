@@ -7,7 +7,9 @@ title-slide-attributes:
     data-background-image: theme-pics/mpi-bridge.gif
 parallaxBackgroundImage: theme-pics/csc-en.svg
 parallaxBackgroundSize: 1000px 1200px
-bibliography: nn-nse-ldlpv-talk.bib
+bibliography: quadmf-opinf.bib
+nocite: |
+  @*
 ---
 
 # Nonlinear Model Order Reduction Schemes 
@@ -64,8 +66,8 @@ provide better reduction vs. accuracy
 M(q(t))\,\dot q(t) = A_0 + A_1\, q(t) + A_2\,q(t) \otimes q(t)
 \end{equation*}
 
-* that best approximates given data on a $k$-dimensional manifold.
-* Numerical proof of concept for a laminar flow problem.
+* that best approximates given data on a $k$-dimensional manifold
+* Numerical proof of concept for a laminar flow problem
 
 # Quadratic Decoding
 
@@ -79,15 +81,15 @@ For a general nonlinear decoding
 \begin{equation*}
 x(t) \approx \tilde x(t) = g(q(t))
 \end{equation*}
-the dynamical system $\dot x(t) = f(x(t))$ is approximated and parametrized via $q$ as
+the dynamical system $\dot x(t) = f(x(t))$ is approximated and parametrized
 \begin{equation*}
 \dot {\tilde x(t)} = G(q(t)) \dot q(t) = f(g(q(t))
 \end{equation*}
 where 
 \begin{equation*}
-G(q(t)) = \nabla_q g(q(t)) \in \mathbb R^{n,k}
+G(q(t)) = \nabla g(q(t)) \in \mathbb R^{n,k}
 \end{equation*}
-is the gradient of $g$ at $q(t)$.
+is the Jacobian of $g$ at $q(t)$.
 
 ---
 
@@ -99,7 +101,7 @@ we have
 \begin{equation*}
 G(q)\bar q = V\bar q + \Omega\,q\otimes \bar q + \Omega\,\bar q\otimes q
 \end{equation*}
-and a approximation/parametrization of a linear system $\dot x(t) = Ax(t)$ as
+and an approximation/parametrization of a linear system $\dot x(t) = Ax(t)$ as
 \begin{equation*}
 G(q)\dot q = A_1 q + A_2\, q\otimes q
 \end{equation*}
@@ -107,7 +109,10 @@ with $A_1 = AV$ and $A_2 = A\Omega$.
 
 ---
 
-Since for a manifold map $g\colon \mathbb R^{k}\to \mathbb R^{n}$, the gradient $\nabla_q g(q(t)) =: G(q(t))$ has full rank,
+Since for a manifold map $g\colon \mathbb R^{k}\to \mathbb R^{n}$, the Jacobian $$\nabla g(q(t)) =: G(q(t))$$ has full rank,
+
+. . .
+
 \begin{equation*}
 G(q(t))^TG(q(t))\dot q(t) = G(q(t))^TA_1 q + G(q(t))^TA_2\, q\otimes q
 \end{equation*}
@@ -126,7 +131,10 @@ We use a POD basis $V\in \mathbb R^{n,k}$ to encode a set of snapshots
 \begin{equation*}
 [v(t_1),\ v(t_2), \dots, v(t_N) ] \to [q(t_1),\ q(t_2), \dots, q(t_N) ]
 \end{equation*}
-by $q(t_i) = Vv(t_i) \in \mathbb R^{k}$
+by $$q(t_i) = Vv(t_i) \in \mathbb R^{k}$$
+
+. . .
+
 In a first step, we infer the quadratic correction $\Omega \in \mathbb R^{N,k^2}$ via 
 \begin{equation*}
 \sum_{i=1}^N \| v(t_i) - Vq(t_i) - \Omega \, q(t_i) \otimes q(t_i)\|^2 \to \min
@@ -138,7 +146,7 @@ Next, we *differentiate* the snapshots to compute
 \begin{equation*}
 \dot v(t_i) \to \dot q(t_i) = V\dot v(t_i)
 \end{equation*}
-and, with the gradient $G(q)$ of the decoding $q\to \tilde v$ at hand, we can form
+and, with the Jacobian $G(q)$ of the decoding $q\to \tilde v$ at hand, we can form
 the derivative along the manifold
 \begin{equation*}
 \dot {\tilde x}(t_i) = G(q(t_i))\dot q(t_i)
@@ -152,58 +160,52 @@ Finally we can solve the quadratic operator inference problem
 \end{equation*}
 that fits a quadratic system to the given snapshots.
 
-# Numerical Realization and Example
-
-**LPV Approximation** of *Navier-Stokes Equations* by *POD* and *Convolutional Neural Networks*
-
----
+# Numerical Example
 
 
-## {data-background-image="pics/cw-Re60-t161-cm-bbw.png" data-background-size="100%"}
-
-```
-data-background-size="100%"  # scales the background image with the window size
-```
-
-<br>
-<br>
-<br>
+## {data-background-image="pics/drivcav_stst_re500.png"}
 
 . . .
 
 ::: {style="position: absolute; width: 60%; right: 0; box-shadow: 0 1px 4px rgba(0,0,0,0.5), 0 5px 25px rgba(0,0,0,0.2); background-color: rgba(0, 0, 0, 0.9); color: #fff; padding: 20px; font-size: 40px; text-align: left;"}
-The *Navier-Stokes* equations
-
+FEM Simulation of Navier-Stokes equations
 $$
-\dot v + (v\cdot \nabla) v- \frac{1}{\mathsf{Re}}\Delta v + \nabla p= f, 
+\dot v + (v\cdot \nabla) v- \frac{1}{\mathsf{Re}}\Delta v + \nabla p= f,
 $$
-
 $$
 \nabla \cdot v = 0.
 $$
-
 :::
 
----
+## {data-background-image="pics/drivcav_stst_re500.png"}
 
-![Velocity snapshot as inline picture](pics/cw-Re60-t161-cm-bbw.png)
+::: {style="position: absolute; width: 65%; right: 0; box-shadow: 0 1px 4px rgba(0,0,0,0.5), 0 5px 25px rgba(0,0,0,0.2); background-color: rgba(0, 0, 0, 0.9); color: #fff; padding: 20px; font-size: 40px; text-align: left;"}
 
-\begin{align}
-\dot v + (v\cdot \nabla) v- \frac{1}{\mathsf{Re}}\Delta v + \nabla p&= f, 
-\nabla \cdot v &= 0.
-\end{align}
-
-::: {style="position: absolute; width: 60%; right: 0; box-shadow: 0 1px 4px rgba(0,0,0,0.5), 0 5px 25px rgba(0,0,0,0.2); background-color: rgba(0, 0, 0, 0.9); color: #fff; padding: 20px; font-size: 40px; text-align: left;"}
+ * 2D laminar lid driven cavity at `Re=500`
+ * About 4000 `dof` in the FEM model
+ * 400 snapshots on `[0, 4.8]` time interval
+ * Reduced order model of size `r=5,8,12`
+ * Extrapolation to the `[4.8, 6]` time interval
+ * Comparison with `POD`, `DMDc`, `OpInf`
 :::
+
+## {data-background-image="pics/driven_cavity_time_domain_3042_rv5.png" data-background-size="80%"}
+
+## {data-background-image="pics/driven_cavity_time_domain_3042_rv8.png" data-background-size="80%"}
+
+## {data-background-image="pics/driven_cavity_time_domain_3042_rv12.png" data-background-size="80%"}
 
 # Conclusion
 
 ## ... and Outlook
 
- * Can also do citations like [@ApkGB95]
+ * Quadratic decoding aligns well with operator inference
 
- * They go to the last slide
+ * Tempting theory but no decisive numerical advantages observed
 
+ * Possible ways for improvement
+   * Regularization of the involved optimization problem
+   * Inference of higher order terms
 
 . . .
 
