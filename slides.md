@@ -48,6 +48,9 @@ with $V$, $W\in \mathbb R^{n,k}$ is a **linear MOR** scheme as
 * fairly standard (*POD*, *Balanced Truncation*)
 * fairly efficient (for linear systems or with hyperreduction like *DEIM*)
 * inherently limited in terms of reduction versus accuracy (cp. *Kolmogorov $n$-width*)
+
+. . .
+
 * good evidence that at very low $k$, nonlinear encodings/decodings
 \begin{equation*}
 q(t) = h(x(t)), \quad \tilde x(t) = g(q(t))
