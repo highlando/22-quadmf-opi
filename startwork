@@ -1,0 +1,6 @@
+#!/bin/bash
+
+git pull
+FILETOEDIT=slides.md
+echo $FILETOEDIT
+NVIM_LISTEN_ADDRESS=/tmp/nvimsocket nvim $FILETOEDIT
